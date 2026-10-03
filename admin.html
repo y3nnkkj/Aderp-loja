@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADERP | Painel de interesse</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="admin-page">
+  <main class="admin-wrap">
+    <div class="admin-card">
+      <span class="tag">PAINEL DO PROJETO</span>
+      <h1>Interesse no ADERP</h1>
+      <p>Este painel mostra quantas vezes o botão de compra foi acionado.</p>
+
+      <div class="stat">
+        <span>Total de cliques em "Comprar"</span>
+        <strong id="total">—</strong>
+      </div>
+
+      <div class="stat">
+        <span>Último clique registrado</span>
+        <strong id="last">—</strong>
+      </div>
+
+      <p id="status" class="admin-status"></p>
+    </div>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const key = params.get("key");
+
+    async function loadStats() {
+      const response = await fetch("/api/stats?key=" + encodeURIComponent(key || ""));
+      const data = await response.json();
+
+      if (!response.ok) {
+        document.getElementById("status").textContent = "Chave de acesso inválida.";
+        return;
+      }
+
+      document.getElementById("total").textContent = data.total;
+      document.getElementById("last").textContent = data.lastClick
+        ? new Date(data.lastClick).toLocaleString("pt-BR")
+        : "Nenhum clique registrado.";
+    }
+
+    loadStats();
+    setInterval(loadStats, 10000);
+  </script>
+</body>
+</html>
